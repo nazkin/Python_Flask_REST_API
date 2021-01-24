@@ -61,14 +61,35 @@ def fetch_products():
 def fetch_product(id):
     product = Product.query.get(id)
     return product_schema.dump(product)
-#Update product
 
-@app.route('/', methods=['GET'])
-def get_root_json():
-    root_data = {
-        'msg': 'We are the root'
-    }
-    return json.dumps(root_data)
+#Update product
+@app.route('/api/product/<id>', methods=['PUT'])
+def update_product(id):
+  product = Product.query.get(id)
+
+  new_name = request.json['name']
+  new_description = request.json['description']
+  new_price = request.json['price']
+  new_qty = request.json['qty']
+
+  product.name = new_name
+  product.description = new_description
+  product.price = new_price
+  product.qty = new_qty
+
+  db.session.commit()
+
+  return product_schema.dump(product)
+
+# Delete Product
+@app.route('/api/product/<id>', methods=['DELETE'])
+def delete_product(id):
+  product = Product.query.get(id)
+  db.session.delete(product)
+  db.session.commit()
+
+  return product_schema.dump(product)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
