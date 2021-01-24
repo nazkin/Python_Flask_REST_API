@@ -50,12 +50,14 @@ def create_product():
     db.session.commit()
 
     return product_schema.dump(new_product)
+
 #Fetch Products
 @app.route('/api/product', methods=['GET'])
 def fetch_products():
     products = Product.query.all()
     result = products_schema.dump(products)
     return json.dumps(result)
+
 #Fetch Product
 @app.route('/api/product/<id>', methods=['GET'])
 def fetch_product(id):
