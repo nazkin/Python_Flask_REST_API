@@ -1,5 +1,4 @@
 from flask import Flask, request
-import product
 import os
 import json
 from models import db,Product,ProductSchema,product_schema,products_schema
