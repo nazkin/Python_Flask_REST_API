@@ -1,42 +1,19 @@
 from flask import Flask, request
-from flask_sqlalchemy import SQLAlchemy
-from flask_marshmallow import Marshmallow
+import product
 import os
 import json
+from models import db,Product,ProductSchema,product_schema,products_schema
 
 app = Flask(__name__)
-#setup base directory
+#base directory
 basedir = os.path.abspath(os.path.dirname(__file__))
-#setup db
+#database
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///'+ os.path.join(basedir, 'db.sqlite')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db.init_app(app)
 
-db = SQLAlchemy(app)
-ma = Marshmallow(app)
 
-class Product(db.Model):
-  id = db.Column(db.Integer, primary_key=True)
-  name = db.Column(db.String(100), unique=True)
-  description = db.Column(db.String(200))
-  price = db.Column(db.Float)
-  qty = db.Column(db.Integer)
-
-  def __init__(self, name, description, price, qty):
-    self.name = name
-    self.description = description
-    self.price = price
-    self.qty = qty
-
-# Product Schema
-class ProductSchema(ma.Schema):
-  class Meta:
-    fields = ('id', 'name', 'description', 'price', 'qty')
-
-# Init schema
-product_schema = ProductSchema()
-products_schema = ProductSchema(many=True)
-
-#Create a Product
+# #Create a Product
 @app.route('/api/product', methods=['POST'])
 def create_product():
     name = request.json['name']
@@ -51,7 +28,7 @@ def create_product():
 
     return product_schema.dump(new_product)
 
-#Fetch Products
+# #Fetch Products
 @app.route('/api/product', methods=['GET'])
 def fetch_products():
     products = Product.query.all()
@@ -64,7 +41,7 @@ def fetch_product(id):
     product = Product.query.get(id)
     return product_schema.dump(product)
 
-#Update product
+# #Update product
 @app.route('/api/product/<id>', methods=['PUT'])
 def update_product(id):
   product = Product.query.get(id)
@@ -83,7 +60,7 @@ def update_product(id):
 
   return product_schema.dump(product)
 
-# Delete Product
+# # Delete Product
 @app.route('/api/product/<id>', methods=['DELETE'])
 def delete_product(id):
   product = Product.query.get(id)
@@ -92,6 +69,6 @@ def delete_product(id):
 
   return product_schema.dump(product)
 
-
+app.add_url_rule("/", endpoint="index")
 if __name__ == '__main__':
     app.run(debug=True)
