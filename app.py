@@ -56,6 +56,12 @@ def fetch_products():
     products = Product.query.all()
     result = products_schema.dump(products)
     return json.dumps(result)
+#Fetch Product
+@app.route('/api/product/<id>', methods=['GET'])
+def fetch_product(id):
+    product = Product.query.get(id)
+    return product_schema.dump(product)
+#Update product
 
 @app.route('/', methods=['GET'])
 def get_root_json():
